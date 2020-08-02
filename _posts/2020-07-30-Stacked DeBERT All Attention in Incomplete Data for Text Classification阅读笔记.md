@@ -1,14 +1,14 @@
 ---
 layout:     post
-title:      Stacked DeBERT: All Attention in Incomplete Data for Text Classification阅读笔记
-subtitle:   
+title:      Stacked DeBERT: All Attention in Incomplete Data for Text Classification
+subtitle:   阅读笔记
 date:       2020-07-30
 author:     Adam
 header-img: img/post-bg-unix-linux.jpg
 catalog: true
 tags:
     - NLP
-    - text classification
+    - TextClassification
 ---
 
 
