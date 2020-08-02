@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Stacked DeBERT: All Attention in Incomplete Data for Text Classification
+title:      Stacked DeBERT_All Attention in Incomplete Data for Text Classification
 subtitle:   阅读笔记
 date:       2020-07-30
 author:     Adam
