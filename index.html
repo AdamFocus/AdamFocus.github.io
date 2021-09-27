@@ -186,7 +186,7 @@
         
           <section id="main" style="float:none;">
   
-    <article id="post-新的一篇"  class="article article-type-post" itemscope itemprop="blogPost" >
+    <article id="post-Pruning and Sparsemax Methods for Hierarchical Attention Networks阅读笔记"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
     
@@ -194,7 +194,7 @@
         
   
     <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2021/09/27/%E6%96%B0%E7%9A%84%E4%B8%80%E7%AF%87/">新的一篇</a>
+      <a class="article-title" href="/2020/08/02/Pruning%20and%20Sparsemax%20Methods%20for%20Hierarchical%20Attention%20Networks%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">Pruning and Sparsemax Methods for Hierarchical Attention Networks</a>
     </h1>
   
 
@@ -202,12 +202,12 @@
     
     <div class="article-meta">
       
-	<a href="/2021/09/27/%E6%96%B0%E7%9A%84%E4%B8%80%E7%AF%87/" class="article-date">
-	  <time datetime="2021-09-27T07:54:17.000Z" itemprop="datePublished">2021-09-27</time>
+	<a href="/2020/08/02/Pruning%20and%20Sparsemax%20Methods%20for%20Hierarchical%20Attention%20Networks%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="article-date">
+	  <time datetime="2020-08-02T05:00:00.000Z" itemprop="datePublished">2020-08-02</time>
 	</a>
 
       
-    <a class="article-category-link" href="/categories/diary/">diary</a>
+    <a class="article-category-link" href="/categories/learning/">learning</a>
 
       
       
@@ -216,10 +216,20 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p class="article-excerpt-content">
-          面试经历
+          摘要介绍并评价了两种层次注意力网络模型：
+
+Hierarchical Pruned Attention Networks：
+在分类过程中删除掉不相关的单词和句子，以减少文档分类中潜在的噪声
+
+Hierarchical Sparsemax Attention Networks：
+将注意力机制中的softmax替换成sparsemax，能够更好处理低概率的单词和句子的重要分布
+
+
+任务分析面向文档分类
+introductionHAN层次注意力网络能够借助文档的结构和注意力机制更好地进行分类，但...
         </p>
         <p class="article-more-link">
-          <a href="/2021/09/27/%E6%96%B0%E7%9A%84%E4%B8%80%E7%AF%87/#more">阅读全文</a>
+          <a href="/2020/08/02/Pruning%20and%20Sparsemax%20Methods%20for%20Hierarchical%20Attention%20Networks%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more">阅读全文</a>
         </p>
       
     </div>
@@ -238,7 +248,7 @@
 
 
   
-    <article id="post-hello-world"  class="article article-type-post" itemscope itemprop="blogPost" >
+    <article id="post-Stacked DeBERT All Attention in Incomplete Data for Text Classification阅读笔记"  class="article article-type-post" itemscope itemprop="blogPost" >
   <div id="articleInner" class="article-inner">
     
     
@@ -246,7 +256,7 @@
         
   
     <h1 class="thumb" itemprop="name">
-      <a class="article-title" href="/2021/09/26/hello-world/">Hello World</a>
+      <a class="article-title" href="/2020/07/30/Stacked%20DeBERT%20All%20Attention%20in%20Incomplete%20Data%20for%20Text%20Classification%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">Stacked DeBERT_All Attention in Incomplete Data for Text Classification</a>
     </h1>
   
 
@@ -254,11 +264,13 @@
     
     <div class="article-meta">
       
-	<a href="/2021/09/26/hello-world/" class="article-date">
-	  <time datetime="2021-09-26T07:15:29.654Z" itemprop="datePublished">2021-09-26</time>
+	<a href="/2020/07/30/Stacked%20DeBERT%20All%20Attention%20in%20Incomplete%20Data%20for%20Text%20Classification%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="article-date">
+	  <time datetime="2020-07-30T05:00:00.000Z" itemprop="datePublished">2020-07-30</time>
 	</a>
 
       
+    <a class="article-category-link" href="/categories/learning/">learning</a>
+
       
       
 
@@ -266,11 +278,145 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p class="article-excerpt-content">
-          Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post1$ hexo new &quot;My New...
+          任务分析不完整数据问题通常认为是一个reconstruction或imputation任务
+通常与missing number imputation有关
+历史工作针对缺失数据插补
+
+Vincent提出将输入映射到有意义的表示上，从而重建出clean data
+其他：predictive mean matching, random forest, Support Vector Machine (SVM) and Multiple imputation by Chained Equations...
         </p>
         <p class="article-more-link">
-          <a href="/2021/09/26/hello-world/#more">阅读全文</a>
+          <a href="/2020/07/30/Stacked%20DeBERT%20All%20Attention%20in%20Incomplete%20Data%20for%20Text%20Classification%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more">阅读全文</a>
+        </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
+    <article id="post-机器学习知识点总结(一)"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2020/07/21/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93(%E4%B8%80)/">机器学习知识点总结(一)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2020/07/21/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93(%E4%B8%80)/" class="article-date">
+	  <time datetime="2020-07-21T05:00:00.000Z" itemprop="datePublished">2020-07-21</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/learning/">learning</a>
+
+      
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p class="article-excerpt-content">
+          第一章 绪论概念：
+机器学习：在计算机上通过数据产生模型的算法
+
+模型：全局性结果
+模式：局部性结果
+
+数据 
+记录
+数据集data set：记录的集合
+示例 instance 样本 sample：每条记录
+属性attribute特征feature 
+属性值
+属性空间，样本空间，输入空间：属性张成的空间
+特征向量
+维数：属性个数
+版本空间：与训练集一致的假设集合
+
+分类:预测离散值
+回归：预测连续值
+
+监督学习：数据有无标注
+无监督学习：
+
+泛化：模型适用于新样本的能力
+
+独立同分布iid...
+        </p>
+        <p class="article-more-link">
+          <a href="/2020/07/21/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93(%E4%B8%80)/#more">阅读全文</a>
+        </p>
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+
+    </footer>
+  </div>
+  
+</article>
+
+<!-- Table of Contents -->
+
+
+  
+    <article id="post-我的第一篇blog"  class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" itemprop="name">
+      <a class="article-title" href="/2020/07/16/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/">我的第一篇blog</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2020/07/16/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/" class="article-date">
+	  <time datetime="2020-07-16T05:00:00.000Z" itemprop="datePublished">2020-07-16</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/diary/">diary</a>
+
+      
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p class="article-excerpt-content">
+          Hello world，I’m Adam.
+
+        </p>
+        <p class="article-more-link">
+          <a href="/2020/07/16/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/#more">阅读全文</a>
         </p>
       
     </div>

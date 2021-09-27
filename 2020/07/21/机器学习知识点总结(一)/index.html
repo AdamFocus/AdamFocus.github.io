@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>机器学习知识点总结(一) | Adam&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="machine learning面试" />
+  
+  
+  
+  
+  <meta name="description" content="第一章 绪论概念： 机器学习：在计算机上通过数据产生模型的算法  模型：全局性结果 模式：局部性结果  数据  记录 数据集data set：记录的集合 示例 instance 样本 sample：每条记录 属性attribute特征feature  属性值 属性空间，样本空间，输入空间：属性张成的空间 特征向量 维数：属性个数 版本空间：与训练集一致的假设集合  分类:预测离散值 回归：预测连续">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习知识点总结(一)">
+<meta property="og:url" content="http://adamfocus.github.io/2020/07/21/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93(%E4%B8%80)/index.html">
+<meta property="og:site_name" content="Adam&#39;s Blog">
+<meta property="og:description" content="第一章 绪论概念： 机器学习：在计算机上通过数据产生模型的算法  模型：全局性结果 模式：局部性结果  数据  记录 数据集data set：记录的集合 示例 instance 样本 sample：每条记录 属性attribute特征feature  属性值 属性空间，样本空间，输入空间：属性张成的空间 特征向量 维数：属性个数 版本空间：与训练集一致的假设集合  分类:预测离散值 回归：预测连续">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/21/U5HTRH.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/21/U5HbQA.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/21/UIZVJg.jpg">
+<meta property="article:published_time" content="2020-07-21T05:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-27T14:01:07.307Z">
+<meta property="article:author" content="Adam Focus">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/07/21/U5HTRH.png">
+  
+
+  
+
+  <link rel="icon" href="/css/images/avatar.jpg">
+  <link rel="apple-touch-icon" href="/css/images/avatar.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="border-width: 0;">
+                <p>Adam&#39;s Blog</p>
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="index.search"><button type="submit" class="search-form-submit"> </button><input type="hidden" name="sitesearch" value="http://adamfocus.github.io"></form>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-机器学习知识点总结(一)" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      机器学习知识点总结(一)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2020/07/21/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93(%E4%B8%80)/" class="article-date">
+	  <time datetime="2020-07-21T05:00:00.000Z" itemprop="datePublished">2020-07-21</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/learning/">learning</a>
+
+      
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="第一章-绪论"><a href="#第一章-绪论" class="headerlink" title="第一章 绪论"></a>第一章 绪论</h2><h3 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h3><ol>
+<li><p>机器学习：在计算机上通过数据产生模型的算法</p>
+</li>
+<li><p>模型：全局性结果</p>
+<p>模式：局部性结果</p>
+</li>
+<li><p>数据 </p>
+<p>记录</p>
+<p>数据集data set：记录的集合</p>
+<p>示例 instance 样本 sample：每条记录</p>
+<p>属性attribute特征feature </p>
+<p>属性值</p>
+<p>属性空间，样本空间，输入空间：属性张成的空间</p>
+<p>特征向量</p>
+<p>维数：属性个数</p>
+<p>版本空间：与训练集一致的假设集合</p>
+</li>
+<li><p>分类:预测离散值</p>
+<p>回归：预测连续值</p>
+</li>
+<li><p>监督学习：数据有无标注</p>
+<p>无监督学习：</p>
+</li>
+<li><p>泛化：模型适用于新样本的能力</p>
+</li>
+<li><p>独立同分布iid：获取的每个样本都是独立采样获取的</p>
+</li>
+<li><p>归纳：从特殊到一般的泛化</p>
+<p>演绎：从一般到特殊的特化</p>
+</li>
+<li><p>假设空间：</p>
+</li>
+<li><p>归纳偏好：学习算法自身在假设空间中对假设进行选择的启发式</p>
+</li>
+<li><p>奥卡姆剃刀：若有多个假设与观察一致，则选最简单的那一个</p>
+</li>
+<li><p>NFL定理：当所有问题出现的机会相同或同样重要，不管是什么算法，期望性能相同，总误差与学习算法无关</p>
+</li>
+<li><p>机器学习发展历程：</p>
+<ul>
+<li><p>推理期：赋予机器逻辑推理能力</p>
+</li>
+<li><p>知识期：赋予机器知识</p>
+</li>
+<li><p>机器学习：</p>
+<ul>
+<li><p>机械学习：</p>
+</li>
+<li><p>示教学习、类比学习：从指令中学习</p>
+</li>
+<li><p>归纳学习：从样例中学习</p>
+<ul>
+<li><p>符号主义学习：决策树、基于逻辑的学习</p>
+</li>
+<li><p>基于神经网络的连接主义：</p>
+</li>
+<li><p>统计学习：</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h3><ol>
+<li><p>根据样例求版本空间：</p>
+<p>首先根据属性和属性取值找出所有的假设</p>
+<p>假设数据集有n种属性，第i个属性可能的取值有$$t_i$$种，加上该属性的泛化取值(*)，所以可能的假设有$$\prod (t_i+1)$$。再用空集表示没有正例，假设空间中一共$$\prod (t_i+1)+1$$种假设。</p>
+<p>再根据给出的样例对假设空间进行删除</p>
+</li>
+</ol>
+<h2 id="第二章-模型评估与选择"><a href="#第二章-模型评估与选择" class="headerlink" title="第二章 模型评估与选择"></a>第二章 模型评估与选择</h2><h3 id="概念：-1"><a href="#概念：-1" class="headerlink" title="概念："></a>概念：</h3><ol>
+<li><p>错误率：分类错误的样本数占总数比例</p>
+<p>精度：1-错误率</p>
+</li>
+<li><p>误差：训练误差、泛化误差</p>
+</li>
+<li><p>过拟合：</p>
+<p>欠拟合：</p>
+</li>
+<li><p>训练集测试集切分方法：</p>
+<p>切分时要尽量保持分布的一致性</p>
+<p>分层采样：保留类别比例的采样</p>
+<ul>
+<li><p>留出法：</p>
+<p>直接将数据集D切分成两个互斥的集合</p>
+<p>使用留出法时通常采用若干次随机划分、重复进行实验评估后取平均值作为留出法的评估结果</p>
+</li>
+<li><p>交叉验证法：</p>
+<p>将数据集分层采样，切分成k个大小相似的互斥子集，每次用k-1个子集的并集作为训练集，余下的那个子集作为测试集，则可以获得k组用于训练和测试。</p>
+<p>在划分成k个子集通常随机使用不同的划分重复p次，即p次k折交叉验证。</p>
+</li>
+<li><p>留一法</p>
+<p>k=样本总数</p>
+</li>
+<li><p>自助法</p>
+<p>使用自助采样法，有放回的进行采样</p>
+<p>在数据集较小有用，同时可以在初始数据集产生较多训练集，有利于集成学习，但改变了原始数据集的分布，引入估计偏差</p>
+<blockquote>
+<p>样本在m次采样不被采到的概率是1/e=0.368</p>
+<p>包外估计</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>验证集：用于模型评估与选择</p>
+</li>
+<li><p>性能度量:</p>
+<ul>
+<li><p>均方误差MSE：</p>
+<p>$$E(f;D)=\frac {1}{m}\sum_{i=1}^{m}(f(x_i)-y_i)^2$$</p>
+<p>对应了常见的欧几里得距离</p>
+</li>
+<li><p>错误率、精度</p>
+</li>
+<li><p>准确率precision和召回率recall</p>
+<p>TP/FP/TN/FN</p>
+<p>$$P=\frac{TP}{TP+FP}$$</p>
+<p>$$R=\frac{TP}{TP+FN}$$</p>
+<p>二者通常相互矛盾，一个高一个则低</p>
+</li>
+<li><p>PR曲线、PR图</p>
+<p>以查全率为x轴，查准率为y轴，将所有样例按照预测结果排序，最可能是正例的样本在前。按这个顺序逐个将样本进行预测，计算此时的查全率和查准率。</p>
+<p>若一个学习器的PR曲线被另一个曲线包住，则可以断言后者性能优于前者。</p>
+<p><img src="https://s1.ax1x.com/2020/07/21/U5HTRH.png" alt="U5HTRH.png"></p>
+<p>选择截断点，注重查准率则截断点靠前，注重查全率则靠后</p>
+</li>
+<li><p>平衡点BEP</p>
+<p>查准率=查全率的点</p>
+</li>
+<li><p>F1值：</p>
+<p>$$F1=\frac{2<em>P</em>R}{P+R}=\frac{2*TP}{样例总数+TP-TN}$$</p>
+<p>基于查全率查准率的调和平均</p>
+<p>$$F_β=\frac{(1+β^2)<em>P</em>R}{(β^2*P)+R}$$</p>
+<p>可以通过β调整二者的不同偏好，β&gt;0度量了查全率对查准率的相对重要性，β&gt;1时查全率有更大影响，β&lt;1查准率有更大影响。</p>
+</li>
+<li><p>宏查全率、宏查准率、宏F1值:</p>
+<p>在各个矩阵上求得的P/R/F1计算平均值得到macro-P/macro-R/macro-F1</p>
+<p>微查全率、微查准率、微F1值:</p>
+<p>先求平均再计算P/R/F1</p>
+</li>
+<li><p>ROC</p>
+<p>ROC曲线（受试者工作特征曲线）以TPR正真例率为纵轴，横轴为FPR假正例率。</p>
+<p>对角线为随机猜测模型</p>
+<p>$$TPR=\frac{TP}{TP+FN}$$</p>
+<p>$$FPR=\frac{FP}{TN+FP}$$</p>
+<p><img src="https://s1.ax1x.com/2020/07/21/U5HbQA.png" alt="U5HbQA.png"></p>
+<p>ROC曲线的绘制:</p>
+<p>根据学习器预测结果进行排序，首先设置所有样例预测为反例，则为(0,0)。依次将每个样例设为正例，并计算绘制点，依次相连。</p>
+<p>若一个ROC曲线将另一个ROC曲线完全包住，则前者性能更好。</p>
+</li>
+<li><p>AUC</p>
+<p>ROC曲线下的面积</p>
+<p>表现的是样本预测的排序质量，与排序误差$$l_{rank}$$有紧密关系</p>
+<p>$$l_{rank}=1-AUC$$</p>
+</li>
+<li><p>代价敏感错误率和代价曲线</p>
+<p>曲线横轴为取值为[0,1]的正例概率代价 ，纵轴为[0,1]的归一化代价</p>
+<p>通过ROC曲线上每一个点绘制(0,FPR)到(1,FNR)的线段，所有线段下的总面积为期望总体代价</p>
+<p><img src="https://s1.ax1x.com/2020/07/21/UIZVJg.jpg" alt="UIZVJg.jpg"></p>
+</li>
+</ul>
+</li>
+<li><p>非均等代价：不同任务的损失计算不一样</p>
+</li>
+<li><p>统计假设检验：</p>
+<blockquote>
+<p>待完善</p>
+</blockquote>
+<p>解释算法泛化性能</p>
+<ul>
+<li><p>二项检验</p>
+</li>
+<li><p>t检验</p>
+</li>
+<li><p>交叉验证t检验</p>
+</li>
+<li><p>McNemar检验</p>
+</li>
+<li><p>Friedman检验</p>
+</li>
+<li><p>Nemenyi后续检验</p>
+</li>
+</ul>
+</li>
+<li><p>偏差方差分解</p>
+<p>泛化误差可以分解为偏差、方差和噪声之和。</p>
+<p>$$E(f;D)=bias^2(x)+var(x)+ε^2$$</p>
+<ul>
+<li>偏差度量了算法的期望预测和真实结果的偏离程度，刻画了算法本身的拟合能力</li>
+<li>方差度量了同样大小的训练集的变动导致的学习性能变化，刻画了数据扰动带来的影响。</li>
+<li>噪声表达了当前任务任何算法达到的期望泛化误差下界，刻画了问题本身的难度。</li>
+</ul>
+</li>
+<li><p>偏差方差窘境：偏差和方差是有冲突的</p>
+</li>
+</ol>
+<h3 id="题目：-1"><a href="#题目：-1" class="headerlink" title="题目："></a>题目：</h3><ol>
+<li>解决过拟合、欠拟合的方法</li>
+</ol>
+<p>未完待续</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/machine-learning/" rel="tag">machine learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/07/30/Stacked%20DeBERT%20All%20Attention%20in%20Incomplete%20Data%20for%20Text%20Classification%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Stacked DeBERT_All Attention in Incomplete Data for Text Classification
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/07/16/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">我的第一篇blog</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-%E7%BB%AA%E8%AE%BA"><span class="nav-number">1.</span> <span class="nav-text">第一章 绪论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">概念：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">题目：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0%E4%B8%8E%E9%80%89%E6%8B%A9"><span class="nav-number">2.</span> <span class="nav-text">第二章 模型评估与选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%EF%BC%9A-1"><span class="nav-number">2.1.</span> <span class="nav-text">概念：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%EF%BC%9A-1"><span class="nav-number">2.2.</span> <span class="nav-text">题目：</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2021 - 2021 Adam&#39;s Blog All Rights Reserved.</p>
+	      
+	      
+  		   	<p id="copyRightCn">Adam Focus 保留所有权利</p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            Adam&#39;s Blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2021 Adam Focus All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
+<!-- 页面点击小红心 -->
+{% if theme.clicklove %}
+      <script type="text/javascript" src="/js/clicklove.js"></script>
+{% endif %}

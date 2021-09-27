@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>pruning and sparsemax methods for hierarchical attention networks | Adam&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="NLP" />
+  
+  
+  
+  
+  <meta name="description" content="摘要介绍并评价了两种层次注意力网络模型：  Hierarchical Pruned Attention Networks： 在分类过程中删除掉不相关的单词和句子，以减少文档分类中潜在的噪声  Hierarchical Sparsemax Attention Networks： 将注意力机制中的softmax替换成sparsemax，能够更好处理低概率的单词和句子的重要分布   任务分析面向文档分类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pruning and Sparsemax Methods for Hierarchical Attention Networks">
+<meta property="og:url" content="http://adamfocus.github.io/2020/08/02/Pruning%20and%20Sparsemax%20Methods%20for%20Hierarchical%20Attention%20Networks%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Adam&#39;s Blog">
+<meta property="og:description" content="摘要介绍并评价了两种层次注意力网络模型：  Hierarchical Pruned Attention Networks： 在分类过程中删除掉不相关的单词和句子，以减少文档分类中潜在的噪声  Hierarchical Sparsemax Attention Networks： 将注意力机制中的softmax替换成sparsemax，能够更好处理低概率的单词和句子的重要分布   任务分析面向文档分类">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="g:/MyBlog/AdamFocus.github.io/img/HAN.png">
+<meta property="og:image" content="g:/MyBlog/AdamFocus.github.io/img/HAN.png">
+<meta property="article:published_time" content="2020-08-02T05:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-27T14:00:57.279Z">
+<meta property="article:author" content="Adam Focus">
+<meta property="article:tag" content="NLP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="g:/MyBlog/AdamFocus.github.io/img/HAN.png">
+  
+
+  
+
+  <link rel="icon" href="/css/images/avatar.jpg">
+  <link rel="apple-touch-icon" href="/css/images/avatar.jpg">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt; src:url("/css/fonts/FuturaPTBold.otf") format("woff");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt-light; src:url("/css/fonts/FuturaPTBook.otf") format("woff");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt-italic; src:url("/css/fonts/FuturaPTBookOblique.otf") format("woff");font-weight:400;font-style:italic;}
+}
+
+  </style>
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+<script src="/js/jquery-3.1.1.min.js"></script>
+
+  
+<script src="/js/bootstrap.js"></script>
+
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+
+  
+    
+<link rel="stylesheet" href="/css/dialog.css">
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="/css/header-post.css" >
+  
+
+  
+  
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  
+  <div id="container">
+    <div id="wrap">
+      
+        <header>
+
+    <div id="allheader" class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="navbar-inner">
+          
+          <div class="container"> 
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+
+            
+              <a class="brand" style="border-width: 0;">
+                <p>Adam&#39;s Blog</p>
+              </a>
+            
+            
+            <div class="navbar-collapse collapse">
+              <ul class="hnav navbar-nav">
+                
+                  <li> <a class="main-nav-link" href="/">首页</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/archives">归档</a> </li>
+                
+                  <li> <a class="main-nav-link" href="/about">关于</a> </li>
+                
+                  <li><div id="search-form-wrap">
+
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="index.search"><button type="submit" class="search-form-submit"> </button><input type="hidden" name="sitesearch" value="http://adamfocus.github.io"></form>
+
+</div></li>
+            </div>
+          </div>
+                
+      </div>
+    </div>
+
+</header>
+
+
+
+      
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-Pruning and Sparsemax Methods for Hierarchical Attention Networks阅读笔记" style="width: 75%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="thumb" class="article-title" itemprop="name">
+      Pruning and Sparsemax Methods for Hierarchical Attention Networks
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      
+	<a href="/2020/08/02/Pruning%20and%20Sparsemax%20Methods%20for%20Hierarchical%20Attention%20Networks%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="article-date">
+	  <time datetime="2020-08-02T05:00:00.000Z" itemprop="datePublished">2020-08-02</time>
+	</a>
+
+      
+    <a class="article-category-link" href="/categories/learning/">learning</a>
+
+      
+      
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>介绍并评价了两种层次注意力网络模型：</p>
+<ul>
+<li><p>Hierarchical Pruned Attention Networks：</p>
+<p>在分类过程中删除掉不相关的单词和句子，以减少文档分类中潜在的噪声</p>
+</li>
+<li><p>Hierarchical Sparsemax Attention Networks：</p>
+<p>将注意力机制中的softmax替换成sparsemax，能够更好处理低概率的单词和句子的重要分布</p>
+</li>
+</ul>
+<h3 id="任务分析"><a href="#任务分析" class="headerlink" title="任务分析"></a>任务分析</h3><p>面向文档分类</p>
+<h3 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h3><p>HAN层次注意力网络能够借助文档的结构和注意力机制更好地进行分类，但它不能区分文档中的弱关联的噪声信息。</p>
+<p>作者将低分值的内容直接进行删除，提出了两种方法。</p>
+<h3 id="Hierarchical-Attention-Networks"><a href="#Hierarchical-Attention-Networks" class="headerlink" title="Hierarchical Attention Networks"></a>Hierarchical Attention Networks</h3><p><img src="G:\MyBlog\AdamFocus.github.io\img\HAN.png"></p>
+<p>给定一个flat padded document，形状为(S,L),S代表句子数量，L代表每句中单词数目</p>
+<p>步骤：</p>
+<ol>
+<li>进行word embedding，得到一个词嵌入表示w(S,L,E),E代表词嵌入的维数，设置为200，使用glove预训练向量。</li>
+<li>w输入到一个双向的GRU中，计算hidden word scores $$h=[\overrightarrow h,\overleftarrow h]$$</li>
+<li>将h输入到单层前馈网络中，获得隐藏word表示 $$u=tanh(W_wh+b_w)$$</li>
+<li>将隐藏表示输入到注意力机制中，借助可训练的词级上下文向量$$u$$计算注意力权重$$\alpha=softmax(u^Tu)$$</li>
+<li>获得句子向量$$s=\alpha\bigodot h$$</li>
+<li>将s传入到双向GRU中，计算hidden sentence scores $$h_s=[\overrightarrow h_s,\overleftarrow h_s]$$</li>
+<li>将隐藏句子scores传入单层前馈网络中，获得隐藏句子表示$$u_s=tanh(W_sh_s+b_s)$$</li>
+<li>隐藏句子表示输入注意力机制中，使用可训练的句子级上下文向量$$u_s$$，计算注意力权重$$\alpha=softmax(u_s^Tu_s)$$</li>
+<li>获得document features $$v=\alpha\bigodot h_s$$</li>
+<li>将文档特征输入到affite transformation，获得class logit scores $$z=W_vv+b_v$$</li>
+<li>通过softmax函数计算最终的分类$$p=softmax(z)$$，通过交叉熵损失计算所有参数的梯度。</li>
+</ol>
+<p>通过$$softmax(z):=\frac {exp(z)}{\sum_{z’} exp(z’)}$$计算attention权重</p>
+<h3 id="HPAN"><a href="#HPAN" class="headerlink" title="HPAN"></a>HPAN</h3><p>给定一个阈值</p>
+<p>步骤：</p>
+<ol>
+<li>进行word embedding，得到一个词嵌入表示w(S,L,E),E代表词嵌入的维数，设置为200，使用glove预训练向量。</li>
+<li>w输入到一个双向的GRU中，计算hidden word scores $$h=[\overrightarrow h,\overleftarrow h]$$</li>
+<li>将h输入到单层前馈网络中，获得隐藏word表示 $$u=tanh(W_wh+b_w)$$</li>
+<li>将隐藏表示输入到注意力机制中，借助可训练的词级上下文向量$$u$$计算注意力权重$$\alpha=softmax(u^Tu)$$</li>
+<li>低于阈值$$\alpha_{min}$$的attention权重都设置为0，然后对剩余的权重进行归一化，使其总和仍为0</li>
+<li>获得句子向量$$s=\alpha\bigodot h$$</li>
+<li>将s传入到双向GRU中，计算hidden sentence scores $$h_s=[\overrightarrow h_s,\overleftarrow h_s]$$</li>
+<li>将隐藏句子scores传入单层前馈网络中，获得隐藏句子表示$$u_s=tanh(W_sh_s+b_s)$$</li>
+<li>隐藏句子表示输入注意力机制中，使用可训练的句子级上下文向量$$u_s$$，计算注意力权重$$\alpha=softmax(u_s^Tu_s)$$</li>
+<li>低于阈值$$\alpha_{min}$$的attention权重都设置为0，然后对剩余的权重进行归一化，使其总和仍为0</li>
+<li>获得document features $$v=\alpha\bigodot h_s$$</li>
+<li>将文档特征输入到affite transformation，获得class logit scores $$z=W_vv+b_v$$</li>
+<li>通过softmax函数计算最终的分类$$p=softmax(z)$$，通过交叉熵损失计算所有参数的梯度</li>
+</ol>
+<h3 id="HSAN"><a href="#HSAN" class="headerlink" title="HSAN"></a>HSAN</h3><p>使用SparseMax函数代替softmax</p>
+<p>通过returning the “Euclidean projection of the input vector z onto the probability simplex，能够更好地处理大量近零概率的分布</p>
+<p>$$sparsemax(z):=argmin_{p∈∆^{k+1}}||p−z||^2$$</p>
+<p>步骤：</p>
+<ol>
+<li>进行word embedding，得到一个词嵌入表示w(S,L,E),E代表词嵌入的维数，设置为200，使用glove预训练向量。</li>
+<li>w输入到一个双向的GRU中，计算hidden word scores $$h=[\overrightarrow h,\overleftarrow h]$$</li>
+<li>将h输入到单层前馈网络中，获得隐藏word表示 $$u=tanh(W_wh+b_w)$$</li>
+<li>将隐藏表示输入到注意力机制中，借助可训练的词级上下文向量$$u$$计算注意力权重$$\alpha=sparsemax(u^Tu)$$</li>
+<li>获得句子向量$$s=\alpha\bigodot h$$</li>
+<li>将s传入到双向GRU中，计算hidden sentence scores $$h_s=[\overrightarrow h_s,\overleftarrow h_s]$$</li>
+<li>将隐藏句子scores传入单层前馈网络中，获得隐藏句子表示$$u_s=tanh(W_sh_s+b_s)$$</li>
+<li>隐藏句子表示输入注意力机制中，使用可训练的句子级上下文向量$$u_s$$，计算注意力权重$$\alpha=sparsemax(u_s^Tu_s)$$</li>
+<li>获得document features $$v=\alpha\bigodot h_s$$</li>
+<li>将文档特征输入到affite transformation，获得class logit scores $$z=W_vv+b_v$$</li>
+<li>通过softmax函数计算最终的分类$$p=softmax(z)$$，通过交叉熵损失计算所有参数的梯度。</li>
+</ol>
+<h3 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h3><table>
+<thead>
+<tr>
+<th>hyperparameter</th>
+<th>values</th>
+<th>Yang’s value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Word2vec embeddings size</td>
+<td>200</td>
+<td>200</td>
+</tr>
+<tr>
+<td>GRU layers</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>GRU layers hidden sizes</td>
+<td>50</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Dropout</td>
+<td>0.1</td>
+<td></td>
+</tr>
+<tr>
+<td>Training epochs</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>Optimizer</td>
+<td>Adam</td>
+<td>SGD</td>
+</tr>
+<tr>
+<td>Learning rate</td>
+<td>0.001</td>
+<td></td>
+</tr>
+<tr>
+<td>Batch size</td>
+<td>64</td>
+<td>64</td>
+</tr>
+<tr>
+<td>HPAN min. attention threshold</td>
+<td>0.05</td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p>IMDB(relatively low samplesize (which allows both faster loading and training) and its simplicity.)</p>
+<h4 id="Experimental-Procedure"><a href="#Experimental-Procedure" class="headerlink" title="Experimental Procedure"></a>Experimental Procedure</h4><ol>
+<li>Train a model on the IMDB dataset for three epochs on the training set.</li>
+<li>Evaluate, at each epoch, the classification accuracy on the validation set.</li>
+<li>Evaluate, after all epochs, the classification accuracy on test dataset</li>
+</ol>
+<p>metric：</p>
+<p>M: Document classification accuracy (%) on obtained by a trained model on the test dataset, after three training epochs.</p>
+<p>作者提出的两个模型效果都不如HAN原模型</p>
+<h3 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h3><p>HPAN在训练时使用cpu，如果使用GPU，在反向传播时会生成nanPruning and Sparsemax Methods for Hierarchical Attention Networks阅读笔记</p>
+<h3 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a>摘要</h3><p>介绍并评价了两种层次注意力网络模型：</p>
+<ul>
+<li><p>Hierarchical Pruned Attention Networks：</p>
+<p>在分类过程中删除掉不相关的单词和句子，以减少文档分类中潜在的噪声</p>
+</li>
+<li><p>Hierarchical Sparsemax Attention Networks：</p>
+<p>将注意力机制中的softmax替换成sparsemax，能够更好处理低概率的单词和句子的重要分布</p>
+</li>
+</ul>
+<h3 id="任务分析-1"><a href="#任务分析-1" class="headerlink" title="任务分析"></a>任务分析</h3><p>面向文档分类</p>
+<h3 id="introduction-1"><a href="#introduction-1" class="headerlink" title="introduction"></a>introduction</h3><p>HAN层次注意力网络能够借助文档的结构和注意力机制更好地进行分类，但它不能区分文档中的弱关联的噪声信息。</p>
+<p>作者将低分值的内容直接进行删除，提出了两种方法。</p>
+<h3 id="Hierarchical-Attention-Networks-1"><a href="#Hierarchical-Attention-Networks-1" class="headerlink" title="Hierarchical Attention Networks"></a>Hierarchical Attention Networks</h3><p><img src="G:\MyBlog\AdamFocus.github.io\img\HAN.png"></p>
+<p>给定一个flat padded document，形状为(S,L),S代表句子数量，L代表每句中单词数目</p>
+<p>步骤：</p>
+<ol>
+<li>进行word embedding，得到一个词嵌入表示w(S,L,E),E代表词嵌入的维数，设置为200，使用glove预训练向量。</li>
+<li>w输入到一个双向的GRU中，计算hidden word scores $$h=[\overrightarrow h,\overleftarrow h]$$</li>
+<li>将h输入到单层前馈网络中，获得隐藏word表示 $$u=tanh(W_wh+b_w)$$</li>
+<li>将隐藏表示输入到注意力机制中，借助可训练的词级上下文向量$$u$$计算注意力权重$$\alpha=softmax(u^Tu)$$</li>
+<li>获得句子向量$$s=\alpha\bigodot h$$</li>
+<li>将s传入到双向GRU中，计算hidden sentence scores $$h_s=[\overrightarrow h_s,\overleftarrow h_s]$$</li>
+<li>将隐藏句子scores传入单层前馈网络中，获得隐藏句子表示$$u_s=tanh(W_sh_s+b_s)$$</li>
+<li>隐藏句子表示输入注意力机制中，使用可训练的句子级上下文向量$$u_s$$，计算注意力权重$$\alpha=softmax(u_s^Tu_s)$$</li>
+<li>获得document features $$v=\alpha\bigodot h_s$$</li>
+<li>将文档特征输入到affite transformation，获得class logit scores $$z=W_vv+b_v$$</li>
+<li>通过softmax函数计算最终的分类$$p=softmax(z)$$，通过交叉熵损失计算所有参数的梯度。</li>
+</ol>
+<p>通过$$softmax(z):=\frac {exp(z)}{\sum_{z’} exp(z’)}$$计算attention权重</p>
+<h3 id="HPAN-1"><a href="#HPAN-1" class="headerlink" title="HPAN"></a>HPAN</h3><p>给定一个阈值</p>
+<p>步骤：</p>
+<ol>
+<li>进行word embedding，得到一个词嵌入表示w(S,L,E),E代表词嵌入的维数，设置为200，使用glove预训练向量。</li>
+<li>w输入到一个双向的GRU中，计算hidden word scores $$h=[\overrightarrow h,\overleftarrow h]$$</li>
+<li>将h输入到单层前馈网络中，获得隐藏word表示 $$u=tanh(W_wh+b_w)$$</li>
+<li>将隐藏表示输入到注意力机制中，借助可训练的词级上下文向量$$u$$计算注意力权重$$\alpha=softmax(u^Tu)$$</li>
+<li>低于阈值$$\alpha_{min}$$的attention权重都设置为0，然后对剩余的权重进行归一化，使其总和仍为0</li>
+<li>获得句子向量$$s=\alpha\bigodot h$$</li>
+<li>将s传入到双向GRU中，计算hidden sentence scores $$h_s=[\overrightarrow h_s,\overleftarrow h_s]$$</li>
+<li>将隐藏句子scores传入单层前馈网络中，获得隐藏句子表示$$u_s=tanh(W_sh_s+b_s)$$</li>
+<li>隐藏句子表示输入注意力机制中，使用可训练的句子级上下文向量$$u_s$$，计算注意力权重$$\alpha=softmax(u_s^Tu_s)$$</li>
+<li>低于阈值$$\alpha_{min}$$的attention权重都设置为0，然后对剩余的权重进行归一化，使其总和仍为0</li>
+<li>获得document features $$v=\alpha\bigodot h_s$$</li>
+<li>将文档特征输入到affite transformation，获得class logit scores $$z=W_vv+b_v$$</li>
+<li>通过softmax函数计算最终的分类$$p=softmax(z)$$，通过交叉熵损失计算所有参数的梯度</li>
+</ol>
+<h3 id="HSAN-1"><a href="#HSAN-1" class="headerlink" title="HSAN"></a>HSAN</h3><p>使用SparseMax函数代替softmax</p>
+<p>通过returning the “Euclidean projection of the input vector z onto the probability simplex，能够更好地处理大量近零概率的分布</p>
+<p>$$sparsemax(z):=argmin_{p∈∆^{k+1}}||p−z||^2$$</p>
+<p>步骤：</p>
+<ol>
+<li>进行word embedding，得到一个词嵌入表示w(S,L,E),E代表词嵌入的维数，设置为200，使用glove预训练向量。</li>
+<li>w输入到一个双向的GRU中，计算hidden word scores $$h=[\overrightarrow h,\overleftarrow h]$$</li>
+<li>将h输入到单层前馈网络中，获得隐藏word表示 $$u=tanh(W_wh+b_w)$$</li>
+<li>将隐藏表示输入到注意力机制中，借助可训练的词级上下文向量$$u$$计算注意力权重$$\alpha=sparsemax(u^Tu)$$</li>
+<li>获得句子向量$$s=\alpha\bigodot h$$</li>
+<li>将s传入到双向GRU中，计算hidden sentence scores $$h_s=[\overrightarrow h_s,\overleftarrow h_s]$$</li>
+<li>将隐藏句子scores传入单层前馈网络中，获得隐藏句子表示$$u_s=tanh(W_sh_s+b_s)$$</li>
+<li>隐藏句子表示输入注意力机制中，使用可训练的句子级上下文向量$$u_s$$，计算注意力权重$$\alpha=sparsemax(u_s^Tu_s)$$</li>
+<li>获得document features $$v=\alpha\bigodot h_s$$</li>
+<li>将文档特征输入到affite transformation，获得class logit scores $$z=W_vv+b_v$$</li>
+<li>通过softmax函数计算最终的分类$$p=softmax(z)$$，通过交叉熵损失计算所有参数的梯度。</li>
+</ol>
+<h3 id="Evaluation-1"><a href="#Evaluation-1" class="headerlink" title="Evaluation"></a>Evaluation</h3><table>
+<thead>
+<tr>
+<th>hyperparameter</th>
+<th>values</th>
+<th>Yang’s value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Word2vec embeddings size</td>
+<td>200</td>
+<td>200</td>
+</tr>
+<tr>
+<td>GRU layers</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>GRU layers hidden sizes</td>
+<td>50</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Dropout</td>
+<td>0.1</td>
+<td></td>
+</tr>
+<tr>
+<td>Training epochs</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>Optimizer</td>
+<td>Adam</td>
+<td>SGD</td>
+</tr>
+<tr>
+<td>Learning rate</td>
+<td>0.001</td>
+<td></td>
+</tr>
+<tr>
+<td>Batch size</td>
+<td>64</td>
+<td>64</td>
+</tr>
+<tr>
+<td>HPAN min. attention threshold</td>
+<td>0.05</td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="数据集-1"><a href="#数据集-1" class="headerlink" title="数据集"></a>数据集</h4><p>IMDB(relatively low samplesize (which allows both faster loading and training) and its simplicity.)</p>
+<h4 id="Experimental-Procedure-1"><a href="#Experimental-Procedure-1" class="headerlink" title="Experimental Procedure"></a>Experimental Procedure</h4><ol>
+<li>Train a model on the IMDB dataset for three epochs on the training set.</li>
+<li>Evaluate, at each epoch, the classification accuracy on the validation set.</li>
+<li>Evaluate, after all epochs, the classification accuracy on test dataset</li>
+</ol>
+<p>metric：</p>
+<p>M: Document classification accuracy (%) on obtained by a trained model on the test dataset, after three training epochs.</p>
+<p>作者提出的两个模型效果都不如HAN原模型</p>
+<h3 id="issue-1"><a href="#issue-1" class="headerlink" title="issue"></a>issue</h3><p>HPAN在训练时使用cpu，如果使用GPU，在反向传播时会生成nan</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+      
+      
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLP/" rel="tag">NLP</a></li></ul>
+
+      
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/07/30/Stacked%20DeBERT%20All%20Attention%20in%20Incomplete%20Data%20for%20Text%20Classification%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Stacked DeBERT_All Attention in Incomplete Data for Text Classification</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="toc-sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    
+        <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">任务分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#introduction"><span class="nav-number">3.</span> <span class="nav-text">introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hierarchical-Attention-Networks"><span class="nav-number">4.</span> <span class="nav-text">Hierarchical Attention Networks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HPAN"><span class="nav-number">5.</span> <span class="nav-text">HPAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HSAN"><span class="nav-number">6.</span> <span class="nav-text">HSAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Evaluation"><span class="nav-number">7.</span> <span class="nav-text">Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Experimental-Procedure"><span class="nav-number">7.2.</span> <span class="nav-text">Experimental Procedure</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#issue"><span class="nav-number">8.</span> <span class="nav-text">issue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81-1"><span class="nav-number">9.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%86%E6%9E%90-1"><span class="nav-number">10.</span> <span class="nav-text">任务分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#introduction-1"><span class="nav-number">11.</span> <span class="nav-text">introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hierarchical-Attention-Networks-1"><span class="nav-number">12.</span> <span class="nav-text">Hierarchical Attention Networks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HPAN-1"><span class="nav-number">13.</span> <span class="nav-text">HPAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HSAN-1"><span class="nav-number">14.</span> <span class="nav-text">HSAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Evaluation-1"><span class="nav-number">15.</span> <span class="nav-text">Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86-1"><span class="nav-number">15.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Experimental-Procedure-1"><span class="nav-number">15.2.</span> <span class="nav-text">Experimental Procedure</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#issue-1"><span class="nav-number">16.</span> <span class="nav-text">issue</span></a></li></ol>
+    
+    </div>
+  </aside>
+
+</section>
+        
+      </div>
+      
+      <footer id="footer">
+  
+
+  <div class="container">
+      	<div class="row">
+	      <p> Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/iTimeTraveler/hexo-theme-hiker" target="_blank">Hexo-theme-hiker</a> </p>
+	      <p id="copyRightEn">Copyright &copy; 2021 - 2021 Adam&#39;s Blog All Rights Reserved.</p>
+	      
+	      
+  		   	<p id="copyRightCn">Adam Focus 保留所有权利</p>
+  		   
+		</div>
+
+		
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var wrapdiv = document.getElementById("wrap");
+    var contentdiv = document.getElementById("content");
+    var allheader = document.getElementById("allheader");
+
+    wrapdiv.style.minHeight = document.body.offsetHeight + "px";
+    if (allheader != null) {
+      contentdiv.style.minHeight = document.body.offsetHeight - allheader.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    } else {
+      contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("footer").offsetHeight + "px";
+    }
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/scripts.js"></script>
+
+
+
+
+
+  
+<script src="/js/dialog.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="myModalLabel">设置</h2>
+      </div>
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+
+
+      <div class="modal-body">
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="javascript:setFontSize();" aria-expanded="true" aria-controls="collapseOne">
+              正文字号大小
+            </a>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body">
+            您已调整页面字体大小
+          </div>
+        </div>
+      
+
+
+          <div style="margin:6px;">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="javascript:setBackground();" aria-expanded="true" aria-controls="collapseTwo">
+              夜间护眼模式
+            </a>
+        </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+          <div class="panel-body">
+            夜间模式已经开启，再次单击按钮即可关闭 
+          </div>
+        </div>
+
+        <div>
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关 于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+        </div>
+         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+          <div class="panel-body">
+            Adam&#39;s Blog
+          </div>
+          <div class="panel-body">
+            Copyright © 2021 Adam Focus All Rights Reserved.
+          </div>
+        </div>
+      </div>
+
+
+      <hr style="margin-top:0px; margin-bottom:0px; width:80%; border-top: 1px solid #000;">
+      <hr style="margin-top:2px; margin-bottom:0px; width:80%; border-top: 3px solid #000;">
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+  
+    <a id="menu-switch"><i class="fa fa-bars fa-lg"></i></a>
+  
+</body>
+</html>
+<!-- 页面点击小红心 -->
+{% if theme.clicklove %}
+      <script type="text/javascript" src="/js/clicklove.js"></script>
+{% endif %}
